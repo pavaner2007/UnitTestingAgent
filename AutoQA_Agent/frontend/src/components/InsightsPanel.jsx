@@ -2,16 +2,16 @@ import { useState } from 'react'
 import { Bot, BookOpen, Workflow, Cpu, ShieldCheck, AlertTriangle } from 'lucide-react'
 
 const TABS = [
-  { id: 'summary',      label: 'Summary',      icon: BookOpen },
-  { id: 'features',     label: 'Features',     icon: ShieldCheck },
-  { id: 'workflow',     label: 'Workflow',     icon: Workflow },
+  { id: 'summary', label: 'Summary', icon: BookOpen },
+  { id: 'features', label: 'Features', icon: ShieldCheck },
+  { id: 'workflow', label: 'Workflow', icon: Workflow },
   { id: 'architecture', label: 'Architecture', icon: Cpu },
 ]
 
 function getConfidenceColor(score) {
   if (score == null) return '#64748B'
-  if (score >= 80)   return '#10B981'
-  if (score >= 60)   return '#F59E0B'
+  if (score >= 80) return '#10B981'
+  if (score >= 60) return '#F59E0B'
   return '#EF4444'
 }
 

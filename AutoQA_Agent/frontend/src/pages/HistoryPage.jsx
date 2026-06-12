@@ -42,7 +42,12 @@ export default function HistoryPage({ onSelectReport }) {
   }
 
   return (
-    <div style={{ padding: '40px 36px', animation: 'fadeSlideUp 0.4s ease both' }}>
+    <div style={{
+      padding: '40px 36px',
+      animation: 'fadeSlideUp 0.4s ease both',
+      minHeight: '100vh',
+      background: 'var(--bg-app)',
+    }}>
       {/* Page header */}
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
         <div>
@@ -120,7 +125,16 @@ export default function HistoryPage({ onSelectReport }) {
             const conf = item.confidence_score ?? item.report?.confidence_score
             const confColor = getConfidenceColor(conf)
             const stack = item.technology_stack || item.report?.technology_stack || {}
-            const allTech = Object.values(stack).flat().filter(Boolean).slice(0, 5)
+            // Stack values may be arrays OR objects — extract string names from both
+            const extractTech = (val) => {
+              if (Array.isArray(val)) return val.filter(v => typeof v === 'string')
+              if (val && typeof val === 'object') return Object.keys(val)
+              if (typeof val === 'string') return [val]
+              return []
+            }
+            const allTechFull = Object.values(stack).flatMap(extractTech).filter(Boolean)
+            const allTech = allTechFull.slice(0, 5)
+            const extraCount = allTechFull.length - 5
             const createdAt = item.created_at
               ? new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
               : '—'
@@ -179,20 +193,20 @@ export default function HistoryPage({ onSelectReport }) {
                 {/* Tech chips */}
                 {allTech.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 14 }}>
-                    {allTech.map(t => (
-                      <span key={t} style={{
+                    {allTech.map((t, ti) => (
+                      <span key={`${i}-${ti}-${t}`} style={{
                         fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 6,
                         background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)',
                         color: 'var(--text-secondary)',
-                      }}>{t}</span>
+                      }}>{String(t)}</span>
                     ))}
-                    {Object.values(stack).flat().filter(Boolean).length > 5 && (
+                    {extraCount > 0 && (
                       <span style={{
                         fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 6,
                         background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
                         color: 'var(--text-muted)',
                       }}>
-                        +{Object.values(stack).flat().filter(Boolean).length - 5} more
+                        +{extraCount} more
                       </span>
                     )}
                   </div>

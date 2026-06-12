@@ -1,24 +1,24 @@
 import { useState } from 'react'
 import { analyzeRepository, downloadPdf } from './api/client'
 
-import Sidebar           from './components/Sidebar'
-import HeroSection       from './components/HeroSection'
-import MetricCards       from './components/MetricCards'
-import AnalysisTimeline  from './components/AnalysisTimeline'
-import InsightsPanel     from './components/InsightsPanel'
-import TechStackPanel    from './components/TechStackPanel'
+import Sidebar from './components/Sidebar'
+import HeroSection from './components/HeroSection'
+import MetricCards from './components/MetricCards'
+import AnalysisTimeline from './components/AnalysisTimeline'
+import InsightsPanel from './components/InsightsPanel'
+import TechStackPanel from './components/TechStackPanel'
 import EvidenceAccordion from './components/EvidenceAccordion'
-import ApiTable          from './components/ApiTable'
-import ArchitectureFlow  from './components/ArchitectureFlow'
-import HistoryPage       from './pages/HistoryPage'
+import ApiTable from './components/ApiTable'
+import ArchitectureFlow from './components/ArchitectureFlow'
+import HistoryPage from './pages/HistoryPage'
 
 import './index.css'
 
 export default function App() {
-  const [page, setPage]           = useState('home')
-  const [loading, setLoading]     = useState(false)
-  const [error, setError]         = useState('')
-  const [report, setReport]       = useState(null)
+  const [page, setPage] = useState('home')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [report, setReport] = useState(null)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [historyCount, setHistoryCount] = useState(0)
 
@@ -64,7 +64,7 @@ export default function App() {
       />
 
       {/* Main content */}
-      <main style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>
+      <main style={{ flex: 1, minWidth: 0, overflowY: 'auto', background: 'var(--bg-app)' }}>
 
         {/* ─── HISTORY PAGE ─── */}
         {page === 'history' && (

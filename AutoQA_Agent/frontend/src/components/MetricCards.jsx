@@ -2,8 +2,8 @@ import { FileCode2, Route, Layers, Target, FolderGit2, Download } from 'lucide-r
 
 function getConfidenceColor(score) {
   if (score == null) return '#64748B'
-  if (score >= 80)   return '#10B981'
-  if (score >= 60)   return '#F59E0B'
+  if (score >= 80) return '#10B981'
+  if (score >= 60) return '#F59E0B'
   return '#EF4444'
 }
 
@@ -64,8 +64,9 @@ function MetricCard({ icon: Icon, value, label, accent, delay = 0 }) {
 
 function ConfidenceCard({ score, delay = 0, onDownload, pdfLoading }) {
   const color = getConfidenceColor(score)
-  const label = score >= 80 ? 'High Confidence' : score >= 60 ? 'Medium' : 'Low Confidence'
-  const radius = 36
+  const sublabel = score >= 80 ? 'Analysis quality is high' : score >= 60 ? 'Moderate analysis quality' : 'Low analysis quality'
+  const badge = score >= 80 ? 'High' : score >= 60 ? 'Medium' : 'Low'
+  const radius = 42
   const circumference = 2 * Math.PI * radius
   const strokeDash = score != null ? ((score / 100) * circumference) : 0
 
@@ -75,78 +76,111 @@ function ConfidenceCard({ score, delay = 0, onDownload, pdfLoading }) {
         background: 'var(--bg-surface)',
         border: '1px solid var(--border)',
         borderRadius: 16,
-        padding: '20px 22px',
+        padding: '20px 20px 16px',
         position: 'relative',
         overflow: 'hidden',
-        transition: 'transform 0.2s, box-shadow 0.2s',
+        transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
         animation: `fadeSlideUp 0.5s ease ${delay}ms both`,
-        display: 'flex', flexDirection: 'column',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'stretch',
+        gap: 14,
       }}
       onMouseEnter={e => {
         e.currentTarget.style.transform = 'translateY(-3px)'
-        e.currentTarget.style.boxShadow = `0 8px 32px ${color}20`
+        e.currentTarget.style.boxShadow = `0 8px 32px ${color}25`
+        e.currentTarget.style.borderColor = `${color}30`
       }}
       onMouseLeave={e => {
         e.currentTarget.style.transform = ''
         e.currentTarget.style.boxShadow = ''
+        e.currentTarget.style.borderColor = 'var(--border)'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      {/* Background glow */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: `radial-gradient(ellipse 80% 60% at 50% 0%, ${color}0A 0%, transparent 70%)`,
+      }} />
+
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{
-            width: 32, height: 32, borderRadius: 9,
+            width: 30, height: 30, borderRadius: 8, flexShrink: 0,
             background: `${color}18`, border: `1px solid ${color}28`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <Target size={15} color={color} />
+            <Target size={14} color={color} />
           </div>
           <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
             Confidence
           </span>
         </div>
+        {/* Badge */}
+        <span style={{
+          fontSize: 10, fontWeight: 700, padding: '3px 9px', borderRadius: 99,
+          background: `${color}18`, border: `1px solid ${color}30`, color,
+          letterSpacing: '0.04em',
+        }}>
+          {badge}
+        </span>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        {/* SVG ring */}
-        <svg width={86} height={86} style={{ flexShrink: 0 }}>
-          <circle cx={43} cy={43} r={radius} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={7} />
+      {/* Centered ring */}
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <svg width={100} height={100}>
+          {/* Track */}
+          <circle cx={50} cy={50} r={radius} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={8} />
+          {/* Progress */}
           <circle
-            cx={43} cy={43} r={radius} fill="none"
-            stroke={color} strokeWidth={7}
+            cx={50} cy={50} r={radius} fill="none"
+            stroke={color} strokeWidth={8}
             strokeDasharray={`${strokeDash} ${circumference}`}
             strokeLinecap="round"
-            transform="rotate(-90 43 43)"
-            style={{ transition: 'stroke-dasharray 1s ease' }}
+            transform="rotate(-90 50 50)"
+            style={{ transition: 'stroke-dasharray 1.2s cubic-bezier(0.4,0,0.2,1)', filter: `drop-shadow(0 0 6px ${color}60)` }}
           />
-          <text x={43} y={47} textAnchor="middle" fontSize={16} fontWeight={800} fill={color} fontFamily="Inter">
+          {/* Score text */}
+          <text x={50} y={45} textAnchor="middle" fontSize={20} fontWeight={800} fill={color} fontFamily="Inter">
             {score != null ? `${Math.round(score)}%` : '—'}
           </text>
+          <text x={50} y={63} textAnchor="middle" fontSize={9} fontWeight={600} fill="rgba(255,255,255,0.35)" fontFamily="Inter" letterSpacing="1">
+            SCORE
+          </text>
         </svg>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color, marginBottom: 4 }}>{label}</div>
-          {onDownload && (
-            <button
-              onClick={onDownload}
-              disabled={pdfLoading}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                background: 'linear-gradient(135deg, #3B82F6, #8B5CF6)',
-                color: '#fff', border: 'none', borderRadius: 8,
-                padding: '7px 14px', fontSize: 11, fontWeight: 700,
-                cursor: pdfLoading ? 'not-allowed' : 'pointer',
-                opacity: pdfLoading ? 0.7 : 1,
-                fontFamily: 'Inter, sans-serif',
-                transition: 'opacity 0.2s',
-                marginTop: 2,
-                letterSpacing: '-0.01em',
-              }}
-            >
-              <Download size={11} />
-              {pdfLoading ? 'Generating…' : 'Download PDF'}
-            </button>
-          )}
-        </div>
       </div>
+
+      {/* Sub-label */}
+      <div style={{ textAlign: 'center', marginTop: -6 }}>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{sublabel}</div>
+      </div>
+
+      {/* Download button */}
+      {onDownload && (
+        <button
+          onClick={onDownload}
+          disabled={pdfLoading}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            width: '100%',
+            background: 'linear-gradient(135deg, #3B82F6, #8B5CF6)',
+            color: '#fff', border: 'none', borderRadius: 10,
+            padding: '9px 14px', fontSize: 12, fontWeight: 700,
+            cursor: pdfLoading ? 'not-allowed' : 'pointer',
+            opacity: pdfLoading ? 0.7 : 1,
+            fontFamily: 'Inter, sans-serif',
+            transition: 'opacity 0.2s, transform 0.15s, box-shadow 0.15s',
+            letterSpacing: '-0.01em',
+            boxShadow: '0 2px 14px rgba(59,130,246,0.4)',
+          }}
+          onMouseEnter={e => { if (!pdfLoading) { e.currentTarget.style.transform = 'scale(1.02)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(59,130,246,0.55)' } }}
+          onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 2px 14px rgba(59,130,246,0.4)' }}
+        >
+          <Download size={13} />
+          {pdfLoading ? 'Generating…' : 'Download PDF'}
+        </button>
+      )}
     </div>
   )
 }
